@@ -1,8 +1,8 @@
+import time
+import config
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
-import config
-import time
 
 service_obj = Service(config.CHROME_DRIVER_PATH)
 driver = webdriver.Chrome(service=service_obj)

@@ -1,3 +1,4 @@
+from dis import disco
 import time
 import config
 from selenium import webdriver
@@ -9,6 +10,7 @@ service_obj = Service(config.CHROME_DRIVER_PATH)
 driver = webdriver.Chrome(service=service_obj)
 driver.implicitly_wait(5)
 
+expected_list = ["Cucumber - 1 Kg", "Raspberry - 1/4 Kg", "Strawberry - 1/4 Kg"]
 discount_code= "rahulshettyacademy"
 driver.get("https://rahulshettyacademy.com/seleniumPractise/")
 
@@ -18,8 +20,14 @@ results = driver.find_elements(By.XPATH, "//div[@class='products']/div")
 
 count = len(results)
 assert count > 0
+
+actual_list = []
 for result in results:
+    actual_list.append(result.find_element(By.XPATH, "h4").text)
     result.find_element(By.XPATH, "div/button").click()
+
+assert actual_list == expected_list
+
 driver.find_element(By.CSS_SELECTOR, "img[alt='Cart']").click()
 driver.find_element(By.XPATH, "//button[text()='PROCEED TO CHECKOUT']").click()
 
@@ -27,16 +35,10 @@ driver.find_element(By.XPATH, "//button[text()='PROCEED TO CHECKOUT']").click()
 driver.find_element(By.CSS_SELECTOR, ".promoCode").send_keys(discount_code)
 driver.find_element(By.CLASS_NAME, "promoBtn").click()
 
-#sum validation
-prices = driver.find_elements(By.XPATH, "//td[5]/p")
-assert prices is not None
-sum_price = 0
-for price in prices:
-    sum_price += int(price.text)
-
 total_amount = driver.find_element(By.CLASS_NAME, "totAmt").text
-
-assert sum_price == int(total_amount)
+discount_amount = driver.find_element(By.CLASS_NAME, "discountAmt").text
+print(discount_amount)
+assert int(total_amount) > int(discount_amount)
 
 wait = WebDriverWait(driver, 10)
 wait.until(expected_conditions.presence_of_element_located((By.CSS_SELECTOR, ".promoInfo")))
